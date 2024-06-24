@@ -6,24 +6,26 @@ using UnityEngine.InputSystem;
 public class CameraController : MonoBehaviour
 {
     [SerializeField] [Range(1, 20)] private float _moveSpeed;
-    [SerializeField] private InputAction _cameraControls;
-
-    private Vector2 _moveDirection;
     
-    private void Start()
+    private Vector2 _moveDirection;
+    private PlayerControls _controls;
+
+    private void Awake()
     {
-        _cameraControls.Enable();
+        _controls = new PlayerControls();
+        _controls.Player.Enable();
     }
 
     private void OnDisable()
     {
-        _cameraControls.Disable();
+        _controls.Disable();
     }
 
     private void Update()
     {
-        _moveDirection = _cameraControls.ReadValue<Vector2>();
+        _moveDirection = _controls.Player.Move.ReadValue<Vector2>();
         _moveDirection.Normalize();
-        transform.position += new Vector3(_moveDirection.x, 0, _moveDirection.y) * _moveSpeed * Time.deltaTime;
+        Vector3 moveDelta = new Vector3(_moveDirection.x, 0, _moveDirection.y) * _moveSpeed * Time.deltaTime;
+        transform.position += moveDelta;
     }
 }
