@@ -8,21 +8,26 @@ public class MovementController : MonoBehaviour
 {
     [SerializeField] [Range(1, 20)] private float _moveSpeed;
     [SerializeField] private float _rotateSpeed;
-    [SerializeField] private InputAction _playerControls;
     [SerializeField] private GameObject _gfx;
     [SerializeField] private Transform _lookAt;
 
     private Vector2 _moveDirection;
-    
-    private void Start()
+    private PlayerControls _controls;
+
+    private void Awake()
     {
-        _playerControls.Enable();
-        _lookAt.localPosition = new Vector3(1, 0, 0);
+        _controls = new PlayerControls();
+        _controls.Player.Enable();
     }
 
     private void OnDisable()
     {
-        _playerControls.Disable();
+        _controls.Player.Disable();
+    }
+
+    private void Start()
+    {
+        _lookAt.localPosition = new Vector3(1, 0, 0);
     }
 
     private void Update()
@@ -47,9 +52,10 @@ public class MovementController : MonoBehaviour
 
     private void movePlayer()
     {
-        _moveDirection = _playerControls.ReadValue<Vector2>();
+        _moveDirection = _controls.Player.Move.ReadValue<Vector2>();
         _moveDirection.Normalize();
-        transform.position += new Vector3(_moveDirection.x, 0, _moveDirection.y) * _moveSpeed * Time.deltaTime;
+        Vector3 moveDelta = new Vector3(_moveDirection.x, 0, _moveDirection.y) * _moveSpeed * Time.deltaTime;
+        transform.position += moveDelta;
     }
 
     private void OnDrawGizmos()
