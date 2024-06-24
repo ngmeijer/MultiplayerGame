@@ -72,3 +72,7 @@ crashlytics-build.properties
 /[Aa]ssets/[Ss]treamingAssets/aa/*
 
 ~$ainstorming.docx
+
+MultiplayerGame/.idea/.idea.MultiplayerGame/.idea/
+
+MultiplayerGame/Assets/TextMesh Pro/
