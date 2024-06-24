@@ -27,7 +27,7 @@ public class ResourceCollectorController : MonoBehaviour, ISubject
         
         AddResource(_currentSelectedResource.GetResourceType(), _currentSelectedResource.Collect());
         
-        Notify();
+        UpdateObserver();
         
         StartCoroutine(collectResource());
     }
@@ -70,21 +70,17 @@ public class ResourceCollectorController : MonoBehaviour, ISubject
 
     public void Attach(IObserver observer)
     {
-        Console.WriteLine("Subject: Attached an observer.");
         this._observers.Add(observer);
     }
 
     public void Detach(IObserver observer)
     {
         this._observers.Remove(observer);
-        Console.WriteLine("Subject: Detached an observer.");
     }
 
 
-    public void Notify()
+    public void UpdateObserver()
     {
-        Console.WriteLine("Subject: Notifying observers...");
-
         foreach (var observer in _observers)
         {
             observer.UpdateObserver(this);
