@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using UnityEngine;
 
 public class GameManager : MonoBehaviour
@@ -12,6 +12,8 @@ public class GameManager : MonoBehaviour
     private void Start()
     {
         _resourceCollector.Attach(_statsCanvasController);
-        _shopController.Attach(_shopCanvasController);
+        
+        if(_shopController != null && _shopCanvasController != null)
+            _shopController.Attach(_shopCanvasController);
     }
 }

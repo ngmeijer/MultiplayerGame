@@ -908,7 +908,7 @@ GameObject:
   - component: {fileID: 796279781}
   - component: {fileID: 796279782}
   m_Layer: 0
-  m_Name: Charges
+  m_Name: ChargesInstanceParent
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1757,7 +1757,7 @@ MonoBehaviour:
   _settings: {fileID: 11400000, guid: bd04227e835ceb448826f0d941591326, type: 2}
   _dashChargeUIPrefab: {fileID: 8553912842333036959, guid: a8871a4993fcd5d49944e32cd86f5cd6, type: 3}
   _dashChargesUIParent: {fileID: 796279781}
-  _dashChargeUIColor: {r: 0, g: 0.021962643, b: 1, a: 1}
+  _dashChargeUIColor: {r: 0, g: 0.062781096, b: 1, a: 1}
 --- !u!1 &1359430131
 GameObject:
   m_ObjectHideFlags: 0
@@ -1787,7 +1787,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 20d28a11fb1c4cac8f82b99e1c7de5fb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _statsCanvasController: {fileID: 1038981307}
+  _statsCanvasController: {fileID: 0}
   _resourceCollector: {fileID: 1667291760}
   _shopController: {fileID: 0}
   _shopCanvasController: {fileID: 0}

@@ -7,6 +7,7 @@ using UnityEngine.Events;
 public class ResourceCollectorController : MonoBehaviour, ISubject
 {
     private IResource _currentSelectedResource;
+    
     [SerializeField] private PlayerResourceStats _currentResources;
 
     private List<IObserver> _observers = new List<IObserver>();
@@ -20,7 +21,7 @@ public class ResourceCollectorController : MonoBehaviour, ISubject
 
     private IEnumerator collectResource()
     {
-        yield return new WaitForSeconds(1);
+        yield return new WaitForSeconds(_currentSelectedResource.GetResourceCollectionRate());
 
         if (_currentSelectedResource == null)
             yield break;
