@@ -10,8 +10,9 @@ public class MovementController : MonoBehaviour, IMove
 {
     [SerializeField] private MovementSettings _moveSettings;
     [SerializeField] private GameObject _gfx;
+    [SerializeField] private Rigidbody _rb;
     [SerializeField] private Transform _lookAt;
-    [SerializeField] private UnityEvent OnDashCountChanged = new UnityEvent();
+    [SerializeField] private UnityEvent<int> OnDashCountChanged = new UnityEvent<int>();
 
     private Vector2 _moveDirection;
     private Vector3 _moveDelta;
@@ -20,10 +21,14 @@ public class MovementController : MonoBehaviour, IMove
     private bool _inDash;
     private bool _rechargingDash;
     private bool _resetDashRecharge;
+    private int _remainingDashCharges;
 
     private void Awake()
     {
         _controls = new PlayerControls();
+        
+        if (_rb == null)
+            _rb = GetComponent<Rigidbody>();
     }
 
     private void OnEnable()
@@ -48,9 +53,13 @@ public class MovementController : MonoBehaviour, IMove
         _currentMoveSpeed = _moveSettings.WalkSpeed;
     }
 
-    private void Update()
+    private void FixedUpdate()
     {
         HandleMove();
+    }
+
+    private void Update()
+    {
         RotatePlayerToViewDirection();
     }
 
@@ -58,10 +67,10 @@ public class MovementController : MonoBehaviour, IMove
     {
         Vector3 lookAtPos = Vector3.zero;
         //Lerp position of lookat depending on input values
-        lookAtPos = Vector3.Lerp(_lookAt.localPosition, new Vector3(_moveDirection.x, 0, _moveDirection.y), Time.deltaTime * _moveSettings.RotateSpeed);
+        lookAtPos = Vector3.Lerp(_lookAt.localPosition, new Vector3(_moveDirection.x, _lookAt.localPosition.y, _moveDirection.y), Time.deltaTime * _moveSettings.RotateSpeed);
 
-        if (_moveDirection.magnitude == 0)
-            lookAtPos = Vector3.Lerp(_lookAt.localPosition, Vector3.zero, Time.deltaTime * _moveSettings.RotateSpeed);
+        // if (_moveDirection.magnitude == 0)
+            // lookAtPos = Vector3.Lerp(_lookAt.localPosition, new Vector3(0, _lookAt.localPosition.y, 0.2f), Time.deltaTime * _moveSettings.RotateSpeed);
 
         _lookAt.localPosition = lookAtPos;
         _gfx.transform.LookAt(_lookAt.position, transform.up);
@@ -82,8 +91,8 @@ public class MovementController : MonoBehaviour, IMove
     {
         _moveDelta.x = _moveDirection.x;
         _moveDelta.z = _moveDirection.y;
-        _moveDelta *= _currentMoveSpeed * Time.deltaTime;
-        transform.position += _moveDelta;
+        _moveDelta *= _currentMoveSpeed * Time.fixedDeltaTime;
+        _rb.velocity = _moveDelta;
     }
 
     public void HandleDash(InputAction.CallbackContext callbackContext)
@@ -96,15 +105,15 @@ public class MovementController : MonoBehaviour, IMove
         if (_inDash)
             yield break;
 
-        if (_moveSettings.RemainingDashCharges <= 0)
+        if (_remainingDashCharges <= 0)
             yield break;
 
-        _moveSettings.RemainingDashCharges--;
+        _remainingDashCharges--;
 
         _inDash = true;
 
         _currentMoveSpeed = _moveSettings.DashSpeed;
-        OnDashCountChanged?.Invoke();
+        OnDashCountChanged?.Invoke(_remainingDashCharges);
         
         yield return new WaitForSeconds(_moveSettings.DashDuration);
         _currentMoveSpeed = _moveSettings.WalkSpeed;
@@ -127,11 +136,11 @@ public class MovementController : MonoBehaviour, IMove
         _rechargingDash = true;
         yield return new WaitForSeconds(_moveSettings.DashRechargeRate);
 
-        _moveSettings.RemainingDashCharges++;
-        OnDashCountChanged?.Invoke();
+        _remainingDashCharges++;
+        OnDashCountChanged?.Invoke(_remainingDashCharges);
         _rechargingDash = false;
         
-        if(_moveSettings.RemainingDashCharges < _moveSettings.MaxDashCharges)
+        if(_remainingDashCharges < _moveSettings.MaxDashCharges)
             RechargeDash();
     }
 

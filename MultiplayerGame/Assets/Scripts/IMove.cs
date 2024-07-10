@@ -2,6 +2,7 @@
 
 public interface IMove
 {
+    public void HandleMove();
     public void HandleMovePerformed(InputAction.CallbackContext ctx);
     public void HandleMoveCancelled(InputAction.CallbackContext ctx);
     public void HandleDash(InputAction.CallbackContext ctx);
