@@ -15,7 +15,8 @@ public class PlayerWorldCanvasController : MonoBehaviour
     private List<Image> _dashChargeImages = new List<Image>();
 
     [SerializeField] private CombatSettings _combatSettings;
-
+    [SerializeField] private Image _healthBar;
+    
     private void Start()
     {
         _currentDashChargeUIColor = _dashChargeUIColor;
@@ -48,9 +49,11 @@ public class PlayerWorldCanvasController : MonoBehaviour
         }
     }
 
-    public void UpdateHealth()
+    public void UpdateHealth(int pRemainingHealth)
     {
-        
+        Vector3 tempScale = _healthBar.transform.localScale;
+        tempScale.x = pRemainingHealth / (float)_combatSettings.MaxHealth;
+        _healthBar.transform.localScale = tempScale;
     }
 
     public void UpdateArmor()
