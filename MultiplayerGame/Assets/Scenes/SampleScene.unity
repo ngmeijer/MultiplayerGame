@@ -2059,7 +2059,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 53db5fd26823ba24b86f08b8119d5128, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _moveSettings: {fileID: 0}
+  _moveSettings: {fileID: 11400000, guid: bd04227e835ceb448826f0d941591326, type: 2}
   _dashChargeUIPrefab: {fileID: 8553912842333036959, guid: a8871a4993fcd5d49944e32cd86f5cd6, type: 3}
   _dashChargesUIParent: {fileID: 796279781}
   _dashChargeUIColor: {r: 0, g: 0.062781096, b: 1, a: 1}
