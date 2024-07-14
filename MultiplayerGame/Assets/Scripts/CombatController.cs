@@ -82,7 +82,19 @@ public class CombatController : MonoBehaviour, IHealthHandler
 
     public void GetHealthRegen(BuffData pData)
     {
-        float regenAmountPerInterval = pData.BuffAmount / pData.BuffTimespan;
+        float regenAmountPerInterval;
+        switch (pData.BuffMeasurement)
+        {
+            case BuffMeasurement.Percentage:
+                regenAmountPerInterval = ((pData.BuffAmount / 100) * _settings.MaxHealth) / pData.BuffTimespan;
+                break;
+            case BuffMeasurement.Absolute:
+                regenAmountPerInterval = pData.BuffAmount / pData.BuffTimespan;
+                break;
+            default:
+                throw new ArgumentOutOfRangeException();
+        }
+        
         StartCoroutine(StartHealthRegen(regenAmountPerInterval, pData.BuffInterval));
     }
 
