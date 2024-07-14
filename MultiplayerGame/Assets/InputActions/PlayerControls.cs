@@ -290,6 +290,15 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""EnableInventoryUI"",
+                    ""type"": ""Button"",
+                    ""id"": ""f6370dd0-5fa3-4fbc-bdbe-1f441f5ccd1e"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -312,6 +321,28 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""groups"": ""Gamepad"",
                     ""action"": ""EnableShopUI"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""b3878fa5-8027-4be9-bffc-556a9b6c3653"",
+                    ""path"": ""<Keyboard>/tab"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""EnableInventoryUI"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""e87c6b1d-3e7a-4e80-8f2b-e852ad11c084"",
+                    ""path"": ""<Gamepad>/dpad/up"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""EnableInventoryUI"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 }
@@ -389,6 +420,7 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
         // UI
         m_UI = asset.FindActionMap("UI", throwIfNotFound: true);
         m_UI_EnableShopUI = m_UI.FindAction("EnableShopUI", throwIfNotFound: true);
+        m_UI_EnableInventoryUI = m_UI.FindAction("EnableInventoryUI", throwIfNotFound: true);
     }
 
     public void Dispose()
@@ -513,11 +545,13 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
     private readonly InputActionMap m_UI;
     private List<IUIActions> m_UIActionsCallbackInterfaces = new List<IUIActions>();
     private readonly InputAction m_UI_EnableShopUI;
+    private readonly InputAction m_UI_EnableInventoryUI;
     public struct UIActions
     {
         private @PlayerControls m_Wrapper;
         public UIActions(@PlayerControls wrapper) { m_Wrapper = wrapper; }
         public InputAction @EnableShopUI => m_Wrapper.m_UI_EnableShopUI;
+        public InputAction @EnableInventoryUI => m_Wrapper.m_UI_EnableInventoryUI;
         public InputActionMap Get() { return m_Wrapper.m_UI; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -530,6 +564,9 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
             @EnableShopUI.started += instance.OnEnableShopUI;
             @EnableShopUI.performed += instance.OnEnableShopUI;
             @EnableShopUI.canceled += instance.OnEnableShopUI;
+            @EnableInventoryUI.started += instance.OnEnableInventoryUI;
+            @EnableInventoryUI.performed += instance.OnEnableInventoryUI;
+            @EnableInventoryUI.canceled += instance.OnEnableInventoryUI;
         }
 
         private void UnregisterCallbacks(IUIActions instance)
@@ -537,6 +574,9 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
             @EnableShopUI.started -= instance.OnEnableShopUI;
             @EnableShopUI.performed -= instance.OnEnableShopUI;
             @EnableShopUI.canceled -= instance.OnEnableShopUI;
+            @EnableInventoryUI.started -= instance.OnEnableInventoryUI;
+            @EnableInventoryUI.performed -= instance.OnEnableInventoryUI;
+            @EnableInventoryUI.canceled -= instance.OnEnableInventoryUI;
         }
 
         public void RemoveCallbacks(IUIActions instance)
@@ -608,5 +648,6 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
     public interface IUIActions
     {
         void OnEnableShopUI(InputAction.CallbackContext context);
+        void OnEnableInventoryUI(InputAction.CallbackContext context);
     }
 }
