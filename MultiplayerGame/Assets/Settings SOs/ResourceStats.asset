@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: b73ff26c1c7545fb97f52a1c48e88750, type: 3}
-  m_Name: New Player Resource Stats
+  m_Name: ResourceStats
   m_EditorClassIdentifier: 
   GoldAmount: 0
   IronAmount: 0
