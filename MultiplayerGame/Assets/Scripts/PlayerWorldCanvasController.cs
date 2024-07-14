@@ -49,10 +49,10 @@ public class PlayerWorldCanvasController : MonoBehaviour
         }
     }
 
-    public void UpdateHealth(int pRemainingHealth)
+    public void UpdateHealth(float pRemainingHealth)
     {
         Vector3 tempScale = _healthBar.transform.localScale;
-        tempScale.x = pRemainingHealth / (float)_combatSettings.MaxHealth;
+        tempScale.x = pRemainingHealth / _combatSettings.MaxHealth;
         _healthBar.transform.localScale = tempScale;
     }
 
