@@ -29,6 +29,8 @@ public class MovementController : MonoBehaviour, IMove
         
         if (_rb == null)
             _rb = GetComponent<Rigidbody>();
+        
+        _remainingDashCharges = _moveSettings.MaxDashCharges;
     }
 
     private void OnEnable()
@@ -66,11 +68,9 @@ public class MovementController : MonoBehaviour, IMove
     private void RotatePlayerToViewDirection()
     {
         Vector3 lookAtPos = Vector3.zero;
-        //Lerp position of lookat depending on input values
-        lookAtPos = Vector3.Lerp(_lookAt.localPosition, new Vector3(_moveDirection.x, _lookAt.localPosition.y, _moveDirection.y), Time.deltaTime * _moveSettings.RotateSpeed);
-
-        // if (_moveDirection.magnitude == 0)
-            // lookAtPos = Vector3.Lerp(_lookAt.localPosition, new Vector3(0, _lookAt.localPosition.y, 0.2f), Time.deltaTime * _moveSettings.RotateSpeed);
+        lookAtPos = Vector3.Lerp(_lookAt.localPosition,
+            new Vector3(_moveDirection.x, _lookAt.localPosition.y, _moveDirection.y),
+            Time.deltaTime * _moveSettings.RotateSpeed);
 
         _lookAt.localPosition = lookAtPos;
         _gfx.transform.LookAt(_lookAt.position, transform.up);
