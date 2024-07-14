@@ -9,11 +9,18 @@ public enum BuffType
     HealthRegen,
 }
 
+public enum BuffMeasurement
+{
+    Percentage,
+    Absolute
+}
+
 [Serializable]
 public struct BuffData
 {
     public BuffType BuffType;
     public int BuffAmount;
+    public BuffMeasurement BuffMeasurement;
     public float BuffTimespan;
     public float BuffInterval;
 }

@@ -52,34 +52,45 @@ public class CombatController : MonoBehaviour, IHealthHandler
         switch (pData.BuffType)
         {
             case BuffType.HealthInstant:
-                GetInstantHealth(pData.BuffAmount);
+                GetInstantHealth(pData);
                 break;
             case BuffType.HealthRegen:
-                GetHealthRegen(pData.BuffAmount, pData.BuffTimespan, pData.BuffInterval);
+                GetHealthRegen(pData);
                 break;
             default:
                 throw new ArgumentOutOfRangeException(nameof(pData.BuffType), pData.BuffType, null);
         }
     }
 
-    public void GetInstantHealth(int pAmount)
+    public void GetInstantHealth(BuffData pData)
     {
-        _remainingHealth += pAmount;
+        switch (pData.BuffMeasurement)
+        {
+            case BuffMeasurement.Percentage:
+                _remainingHealth += (pData.BuffAmount / 100f) * _settings.MaxHealth;
+                break;
+            case BuffMeasurement.Absolute:
+                _remainingHealth += pData.BuffAmount;
+                break;
+            default:
+                throw new ArgumentOutOfRangeException(nameof(pData.BuffMeasurement), pData.BuffMeasurement, null);
+        }
+
         _remainingHealth = Mathf.Clamp(_remainingHealth, 0, _settings.MaxHealth);
         OnHealthChanged?.Invoke(_remainingHealth);
     }
 
-    public void GetHealthRegen(int pAmount, float pTime, float pInterval)
+    public void GetHealthRegen(BuffData pData)
     {
-        StartCoroutine(StartHealthRegen(pAmount, pTime, pInterval));
+        float regenAmountPerInterval = pData.BuffAmount / pData.BuffTimespan;
+        StartCoroutine(StartHealthRegen(regenAmountPerInterval, pData.BuffInterval));
     }
 
-    private IEnumerator StartHealthRegen(float pTotalHealthAmount, float pTotalTimeForRegen, float pInterval)
+    private IEnumerator StartHealthRegen(float pRegenAmountPerInterval, float pInterval)
     {
-        float regenAmountPerInterval = pTotalHealthAmount / pTotalTimeForRegen;
         while (_remainingHealth < _settings.MaxHealth)
         {
-            _remainingHealth += regenAmountPerInterval;
+            _remainingHealth += pRegenAmountPerInterval;
             
             OnHealthChanged?.Invoke(_remainingHealth);
             

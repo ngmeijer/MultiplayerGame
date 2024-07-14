@@ -4,7 +4,7 @@
 
     public void DetermineBuffResult(BuffData pData);
 
-    public void GetInstantHealth(int pAmount);
+    public void GetInstantHealth(BuffData pData);
 
-    public void GetHealthRegen(int pAmount, float pTime, float pInterval);
+    public void GetHealthRegen(BuffData pData);
 }
