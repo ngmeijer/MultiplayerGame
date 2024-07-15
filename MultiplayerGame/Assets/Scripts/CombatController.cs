@@ -3,21 +3,51 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
+using UnityEngine.InputSystem;
 
 public class CombatController : MonoBehaviour, IHealthHandler
 {
     [SerializeField] private CombatSettings _settings;
     [SerializeField] private UnityEvent<float> OnHealthChanged = new();
-
+    [SerializeField] private Transform _weaponParent;
+    private PlayerControls _controls;
     private Vector3 _startPos;
-
     private float _remainingHealth;
     private int _remainingArmor;
-    
+    private Animator _currentWeaponAnimator;
+
+    private WeaponSettings _weaponSettings;
+
+    private bool _canAttack = true;
+
+    private void Awake()
+    {
+        _controls = new PlayerControls();
+    }
+
     private void Start()
     {
         _remainingHealth = _settings.MaxHealth;
         _startPos = transform.position;
+    }
+
+    private void OnEnable()
+    {
+        _controls.Player.Enable();
+        _controls.Player.Attack.performed += HandleAttackPerformed;
+    }
+
+    private void OnDisable()
+    {
+        _controls.Player.Disable();
+        _controls.Player.Attack.performed -= HandleAttackPerformed;
+    }
+
+    private IEnumerator StartWeaponAttackCountdown()
+    {
+        yield return new WaitForSeconds(_weaponSettings.AttackSpeed);
+
+        _canAttack = true;
     }
 
     public void ReceiveDamage(int pAmount)
@@ -35,16 +65,22 @@ public class CombatController : MonoBehaviour, IHealthHandler
         }
     }
 
+    private void HandleAttackPerformed(InputAction.CallbackContext obj)
+    {
+        if (!_canAttack)
+            return;
+        
+        _currentWeaponAnimator.SetTrigger("Attack");
+        _canAttack = false;
+
+        StartCoroutine(StartWeaponAttackCountdown());
+    }
+
     private void ResetStats()
     {
         transform.position = _startPos;
         _remainingHealth = _settings.MaxHealth;
         OnHealthChanged?.Invoke(_remainingHealth);
-    }
-
-    public void DetermineHazardResult()
-    {
-        
     }
 
     public void DetermineBuffResult(BuffData pData)
@@ -60,6 +96,12 @@ public class CombatController : MonoBehaviour, IHealthHandler
             default:
                 throw new ArgumentOutOfRangeException(nameof(pData.BuffType), pData.BuffType, null);
         }
+    }
+
+    public void ReceiveWeaponData(WeaponSettings pWeaponSettings)
+    {
+        _weaponSettings = pWeaponSettings;
+        _currentWeaponAnimator = _weaponParent.GetComponentInChildren<Animator>();
     }
 
     public void GetInstantHealth(BuffData pData)
