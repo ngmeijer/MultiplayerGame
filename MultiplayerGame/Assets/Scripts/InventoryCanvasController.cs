@@ -40,4 +40,25 @@ public class InventoryCanvasController : MonoBehaviour
                 throw new ArgumentOutOfRangeException();
         }
     }
+    
+    public void UpdateInventoryCanvas(WeaponSettings pNewWeapon)
+    {
+        switch (pNewWeapon.Type)
+        {
+            case WeaponType.Shotgun:
+                break;
+            case WeaponType.SMG:
+                break;
+            case WeaponType.Sniper:
+                break;
+            case WeaponType.AssaultRifle:
+                break;
+            case WeaponType.Sword:
+                break;
+            case WeaponType.Axe:
+                break;
+            default:
+                throw new ArgumentOutOfRangeException();
+        }
+    }
 }

@@ -10,8 +10,8 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 4de8396307694902bfebd89f4279aaa6, type: 3}
-  m_Name: New Armor Settings
+  m_Name: Helmet test
   m_EditorClassIdentifier: 
   _type: 0
-  _armorValue: 0
+  _armorValue: 20
   _armorUISprite: {fileID: 5129307334249272741, guid: 252d1f9f9eb6dfe46873735361f596d6, type: 3}
