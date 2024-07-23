@@ -18,6 +18,10 @@ public class CombatController : MonoBehaviour, IHealthHandler
 
     private WeaponSettings _weaponSettings;
 
+    private ArmorSettings _helmetSettings;
+    private ArmorSettings _upperBodySettings;
+    private ArmorSettings _lowerBodySettings;
+
     private bool _canAttack = true;
 
     private void Awake()
@@ -52,7 +56,9 @@ public class CombatController : MonoBehaviour, IHealthHandler
 
     public void ReceiveDamage(int pAmount)
     {
-        _remainingHealth -= pAmount;
+        int netDamage = CalculateNetDamage(pAmount);
+        
+        _remainingHealth -= netDamage;
 
         _remainingHealth = Mathf.Clamp(_remainingHealth, 0, _settings.MaxHealth);
         
@@ -63,6 +69,20 @@ public class CombatController : MonoBehaviour, IHealthHandler
             Debug.Log("Player died.");
             ResetStats();
         }
+    }
+
+    private int GetTotalAvailableArmor()
+    {
+        float helmetValue = _helmetSettings.ArmorValue;
+        return (int)helmetValue;
+    }
+
+    private int CalculateNetDamage(int pRawDamage)
+    {
+        int totalAvailableArmor = GetTotalAvailableArmor();
+        int damageReductionPercentage = totalAvailableArmor / _settings.MaxArmor;
+        int netDamage = pRawDamage - (damageReductionPercentage * totalAvailableArmor);
+        return netDamage;
     }
 
     private void HandleAttackPerformed(InputAction.CallbackContext obj)
@@ -95,6 +115,24 @@ public class CombatController : MonoBehaviour, IHealthHandler
                 break;
             default:
                 throw new ArgumentOutOfRangeException(nameof(pData.BuffType), pData.BuffType, null);
+        }
+    }
+
+    public void ReceiveArmorData(ArmorSettings pArmorSettings)
+    {
+        switch (pArmorSettings.Type)
+        {
+            case ArmorType.Helmet:
+                _helmetSettings = pArmorSettings;
+                break;
+            case ArmorType.UpperBodyArmor:
+                _upperBodySettings = pArmorSettings;
+                break;
+            case ArmorType.LowerBodyArmor:
+                _lowerBodySettings = pArmorSettings;
+                break;
+            default:
+                throw new ArgumentOutOfRangeException();
         }
     }
 

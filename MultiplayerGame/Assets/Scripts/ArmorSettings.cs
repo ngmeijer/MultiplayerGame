@@ -3,7 +3,7 @@
 public enum ArmorType
 {
     Helmet,
-    UpperbodyArmor,
+    UpperBodyArmor,
     LowerBodyArmor,
 }
 
