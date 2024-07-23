@@ -10,8 +10,11 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 07d0ec43db4c48328d88010dd600d96b, type: 3}
-  m_Name: Shotgun 1
+  m_Name: Axe
   m_EditorClassIdentifier: 
-  _type: 0
+  _type: 5
   _weaponUISprite: {fileID: 0}
-  _baseDamage: 0
+  _baseDamage: 20
+  _attackSpeed: 2
+  _critChance: 0
+  _critDamage: 0
