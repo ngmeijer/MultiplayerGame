@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -8,8 +9,17 @@ public class InventoryCanvasController : MonoBehaviour
 {
     [SerializeField] private GameObject _inventoryUI;
     [SerializeField] private Image _helmetImage;
+    [SerializeField] private TextMeshProUGUI _helmetArmorValue;
+    
     [SerializeField] private Image _upperbodyArmorImage;
+    [SerializeField] private TextMeshProUGUI _upperbodyArmorValue;
+    
     [SerializeField] private Image _lowerbodyArmorImage;
+    [SerializeField] private TextMeshProUGUI _lowerbodyArmorValue;
+
+    [SerializeField] private TextMeshProUGUI _totalArmorText;
+    [SerializeField] private TextMeshProUGUI _damageReductionText;
+    
     private bool _inventoryUIEnabled;
 
     private void Start()
@@ -23,22 +33,19 @@ public class InventoryCanvasController : MonoBehaviour
         _inventoryUI.SetActive(_inventoryUIEnabled);
     }
 
-    public void UpdateInventoryCanvas(ArmorSettings pNewArmor)
+    public void UpdateArmorInventoryCanvas(ArmorEquipment pArmorData)
     {
-        switch (pNewArmor.Type)
-        {
-            case ArmorType.Helmet:
-                _helmetImage.sprite = pNewArmor.ArmorUISprite;
-                break;
-            case ArmorType.UpperbodyArmor:
-                _upperbodyArmorImage.sprite = pNewArmor.ArmorUISprite;
-                break;
-            case ArmorType.LowerBodyArmor:
-                _lowerbodyArmorImage.sprite = pNewArmor.ArmorUISprite;
-                break;
-            default:
-                throw new ArgumentOutOfRangeException();
-        }
+        UpdateArmorUI(pArmorData.HelmetData, _helmetImage, _helmetArmorValue);
+        UpdateArmorUI(pArmorData.UpperBodyData, _upperbodyArmorImage, _upperbodyArmorValue);
+        UpdateArmorUI(pArmorData.LowerBodyData, _lowerbodyArmorImage, _lowerbodyArmorValue);
+        _totalArmorText.SetText($"Raw total armor: {pArmorData.TotalArmor}");
+        _damageReductionText.SetText($"Damage reduction: {pArmorData.TotalDamageReductionPercentage * 100}%");
+    }
+
+    private void UpdateArmorUI(ArmorSettings pData, Image pImage, TextMeshProUGUI pArmorValue)
+    {
+        pImage.sprite = pData.ArmorUISprite;
+        pArmorValue.SetText(pData.ArmorValue.ToString());
     }
     
     public void UpdateInventoryCanvas(WeaponSettings pNewWeapon)

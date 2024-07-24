@@ -5,16 +5,25 @@ using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.InputSystem;
 
+[Serializable]
+public struct ArmorEquipment
+{
+    public ArmorSettings HelmetData;
+    public ArmorSettings UpperBodyData;
+    public ArmorSettings LowerBodyData;
+
+    public int TotalArmor;
+    public float TotalDamageReductionPercentage;
+}
+
 public class InventoryController : MonoBehaviour
 {
     private PlayerControls _controls;
 
-    [SerializeField] private ArmorSettings _helmetEquipped;
-    [SerializeField] private ArmorSettings _upperBodyArmorEquipped;
-    [SerializeField] private ArmorSettings _lowerBodyArmorEquipped;
+    [SerializeField] private ArmorEquipment _armorEquipment;
 
     [SerializeField] private UnityEvent OnChangedInventoryEnabledState = new UnityEvent();
-    [SerializeField] private UnityEvent<ArmorSettings> OnChangedArmorEquipped = new UnityEvent<ArmorSettings>();
+    [SerializeField] private UnityEvent<ArmorEquipment> OnChangedArmorEquipped = new UnityEvent<ArmorEquipment>();
     [SerializeField] private UnityEvent<WeaponSettings> OnChangedWeaponEquipped = new UnityEvent<WeaponSettings>();
 
     private void Awake()
@@ -24,28 +33,32 @@ public class InventoryController : MonoBehaviour
 
     private void Start()
     {
-        if (_helmetEquipped != null)
-            OnChangedArmorEquipped?.Invoke(_helmetEquipped);
-        if (_upperBodyArmorEquipped != null)
-            OnChangedArmorEquipped?.Invoke(_upperBodyArmorEquipped);
-        if (_lowerBodyArmorEquipped != null)
-            OnChangedArmorEquipped?.Invoke(_lowerBodyArmorEquipped);
+        UpdateArmorStats();
+        OnChangedArmorEquipped?.Invoke(_armorEquipment);
     }
 
     private void OnEnable()
     {
         _controls.UI.Enable();
-        _controls.UI.EnableInventoryUI.performed += HandleMovePerformed;
+        _controls.UI.EnableInventoryUI.performed += HandleInventoryUIActivation;
     }
 
     private void OnDisable()
     {
         _controls.UI.Disable();
-        _controls.UI.EnableInventoryUI.performed -= HandleMovePerformed;
+        _controls.UI.EnableInventoryUI.performed -= HandleInventoryUIActivation;
     }
 
-    private void HandleMovePerformed(InputAction.CallbackContext obj)
+    private void HandleInventoryUIActivation(InputAction.CallbackContext obj)
     {
         OnChangedInventoryEnabledState?.Invoke();
+    }
+
+    private void UpdateArmorStats()
+    {
+        _armorEquipment.TotalArmor = (int)(_armorEquipment.HelmetData.ArmorValue + 
+                                           _armorEquipment.UpperBodyData.ArmorValue +
+                                           _armorEquipment.LowerBodyData.ArmorValue);
+        _armorEquipment.TotalDamageReductionPercentage = _armorEquipment.TotalArmor / CombatController.MAX_ARMOR;
     }
 }
