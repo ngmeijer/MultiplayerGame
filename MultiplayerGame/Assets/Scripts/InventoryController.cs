@@ -22,6 +22,8 @@ public class InventoryController : MonoBehaviour
 
     [SerializeField] private ArmorEquipment _armorEquipment;
 
+    [SerializeField] private WeaponSettings _weaponEquipped;
+
     [SerializeField] private UnityEvent OnChangedInventoryEnabledState = new UnityEvent();
     [SerializeField] private UnityEvent<ArmorEquipment> OnChangedArmorEquipped = new UnityEvent<ArmorEquipment>();
     [SerializeField] private UnityEvent<WeaponSettings> OnChangedWeaponEquipped = new UnityEvent<WeaponSettings>();

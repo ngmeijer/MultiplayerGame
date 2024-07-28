@@ -48,6 +48,8 @@ public class InventoryCanvasController : MonoBehaviour
         pArmorValue.SetText(pData.ArmorValue.ToString());
     }
     
+    
+    
     public void UpdateInventoryCanvas(WeaponSettings pNewWeapon)
     {
         switch (pNewWeapon.Type)
