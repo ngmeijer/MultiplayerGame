@@ -13,5 +13,5 @@ MonoBehaviour:
   m_Name: Upper body test
   m_EditorClassIdentifier: 
   _type: 1
-  _armorValue: 20
+  _armorValue: 35
   _armorUISprite: {fileID: 5129307334249272741, guid: 252d1f9f9eb6dfe46873735361f596d6, type: 3}

@@ -7,6 +7,7 @@ using UnityEngine.InputSystem;
 
 public class CombatController : MonoBehaviour, IHealthHandler
 {
+    public const float MAX_ARMOR = 1000;
     [SerializeField] private CombatSettings _settings;
     [SerializeField] private UnityEvent<float> OnHealthChanged = new();
     [SerializeField] private Transform _weaponParent;
@@ -24,8 +25,13 @@ public class CombatController : MonoBehaviour, IHealthHandler
 
     private bool _canAttack = true;
 
+    [SerializeField] private Transform _rangedWeaponParent;
+    [SerializeField] private Transform _rangedWeaponLookAt;
+    private Camera _cam;
+
     private void Awake()
     {
+        _cam = Camera.main;
         _controls = new PlayerControls();
     }
 
@@ -39,12 +45,14 @@ public class CombatController : MonoBehaviour, IHealthHandler
     {
         _controls.Player.Enable();
         _controls.Player.Attack.performed += HandleAttackPerformed;
+        _controls.Player.MouseMove.performed += HandleMouseMovePerformed;
     }
 
     private void OnDisable()
     {
         _controls.Player.Disable();
         _controls.Player.Attack.performed -= HandleAttackPerformed;
+        _controls.Player.MouseMove.performed -= HandleMouseMovePerformed;
     }
 
     private IEnumerator StartWeaponAttackCountdown()
@@ -71,10 +79,22 @@ public class CombatController : MonoBehaviour, IHealthHandler
         }
     }
 
+    private void HandleMouseMovePerformed(InputAction.CallbackContext obj)
+    {
+        Vector2 mousePos = obj.ReadValue<Vector2>();
+        Vector3 mouseWorldPos = _cam.ScreenToWorldPoint(new Vector3(mousePos.x, mousePos.y, _cam.nearClipPlane));
+        Physics.Raycast(mouseWorldPos, _cam.transform.forward, out RaycastHit hit);
+
+        Vector3 lookAtTargetPos = new Vector3(hit.point.x, 0.2f, hit.point.z);
+        _rangedWeaponLookAt.transform.position = lookAtTargetPos;
+        
+        _rangedWeaponParent.LookAt(_rangedWeaponLookAt);
+    }
+
     private int GetTotalAvailableArmor()
     {
-        float helmetValue = _helmetSettings.ArmorValue;
-        return (int)helmetValue;
+        float armorValue = _helmetSettings.ArmorValue + _upperBodySettings.ArmorValue + _lowerBodySettings.ArmorValue;
+        return (int)armorValue;
     }
 
     private int CalculateNetDamage(int pRawDamage)
@@ -88,6 +108,9 @@ public class CombatController : MonoBehaviour, IHealthHandler
     private void HandleAttackPerformed(InputAction.CallbackContext obj)
     {
         if (!_canAttack)
+            return;
+
+        if (_currentWeaponAnimator == null)
             return;
         
         _currentWeaponAnimator.SetTrigger("Attack");
@@ -190,4 +213,10 @@ public class CombatController : MonoBehaviour, IHealthHandler
         }
     }
 
+    private void OnDrawGizmos()
+    {
+        Gizmos.color = Color.red;
+        Gizmos.DrawSphere(_rangedWeaponLookAt.position, 0.5f);
+        Gizmos.DrawLine(transform.position, _rangedWeaponParent.position);
+    }
 }

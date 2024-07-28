@@ -13,5 +13,5 @@ MonoBehaviour:
   m_Name: Lower body test
   m_EditorClassIdentifier: 
   _type: 2
-  _armorValue: 20
+  _armorValue: 50
   _armorUISprite: {fileID: 5129307334249272741, guid: 252d1f9f9eb6dfe46873735361f596d6, type: 3}
