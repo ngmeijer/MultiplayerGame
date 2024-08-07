@@ -7,6 +7,7 @@ using UnityEngine.Events;
 public class ResourceCollectorController : MonoBehaviour, ISubject
 {
     private IResource _currentSelectedResource;
+    
     [SerializeField] private PlayerResourceStats _currentResources;
 
     private List<IObserver> _observers = new List<IObserver>();
@@ -20,14 +21,14 @@ public class ResourceCollectorController : MonoBehaviour, ISubject
 
     private IEnumerator collectResource()
     {
-        yield return new WaitForSeconds(1);
+        yield return new WaitForSeconds(_currentSelectedResource.GetResourceCollectionRate());
 
         if (_currentSelectedResource == null)
             yield break;
         
         AddResource(_currentSelectedResource.GetResourceType(), _currentSelectedResource.Collect());
         
-        Notify();
+        UpdateObserver();
         
         StartCoroutine(collectResource());
     }
@@ -70,21 +71,17 @@ public class ResourceCollectorController : MonoBehaviour, ISubject
 
     public void Attach(IObserver observer)
     {
-        Console.WriteLine("Subject: Attached an observer.");
         this._observers.Add(observer);
     }
 
     public void Detach(IObserver observer)
     {
         this._observers.Remove(observer);
-        Console.WriteLine("Subject: Detached an observer.");
     }
 
 
-    public void Notify()
+    public void UpdateObserver()
     {
-        Console.WriteLine("Subject: Notifying observers...");
-
         foreach (var observer in _observers)
         {
             observer.UpdateObserver(this);

@@ -10,14 +10,20 @@ public enum ResourceType
     IRON,
 }
 
+[Serializable]
+public struct ResourceSettings
+{
+    public ResourceType Type;
+}
+
 public class Resource : MonoBehaviour, IResource
 {
-    [SerializeField] private ResourceType _type;
+    [SerializeField] private ResourceSettings _settings;
     [SerializeField] private int _maxResourceAmount;
     [SerializeField] private float _collectionRate;
-
-    [SerializeField] private TextMeshProUGUI _currentResourceAmountText;
     
+    [SerializeField] private TextMeshProUGUI _currentResourceAmountText;
+
     private float _currentAmount;
 
     private void Start()
@@ -27,7 +33,9 @@ public class Resource : MonoBehaviour, IResource
     }
 
 
-    public ResourceType GetResourceType() => _type;
+    public ResourceType GetResourceType() => _settings.Type;
+
+    public float GetResourceCollectionRate() => _collectionRate;
     
     public float Collect()
     {
@@ -52,6 +60,8 @@ public class Resource : MonoBehaviour, IResource
 public interface IResource
 {
     public ResourceType GetResourceType();
+
+    public float GetResourceCollectionRate();
     
     public float Collect();
 
