@@ -30,7 +30,7 @@ public class InventoryCanvasController : MonoBehaviour
             case ArmorType.Helmet:
                 _helmetImage.sprite = pNewArmor.ArmorUISprite;
                 break;
-            case ArmorType.UpperbodyArmor:
+            case ArmorType.UpperBodyArmor:
                 _upperbodyArmorImage.sprite = pNewArmor.ArmorUISprite;
                 break;
             case ArmorType.LowerBodyArmor:

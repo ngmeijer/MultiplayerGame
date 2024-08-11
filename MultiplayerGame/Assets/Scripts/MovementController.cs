@@ -1,12 +1,13 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Mirror;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.InputSystem;
 
 
-public class MovementController : MonoBehaviour, IMove
+public class MovementController : NetworkBehaviour, IMove
 {
     [SerializeField] private MovementSettings _moveSettings;
     [SerializeField] private GameObject _gfx;
@@ -24,18 +25,13 @@ public class MovementController : MonoBehaviour, IMove
     private int _remainingDashCharges;
     private bool _inUI;
 
-    private void Awake()
+    public override void OnStartLocalPlayer()
     {
+        _lookAt.localPosition = new Vector3(1, 0, 0);
+        _currentMoveSpeed = _moveSettings.WalkSpeed;
+        
         _controls = new PlayerControls();
         
-        if (_rb == null)
-            _rb = GetComponent<Rigidbody>();
-        
-        _remainingDashCharges = _moveSettings.MaxDashCharges;
-    }
-
-    private void OnEnable()
-    {
         _controls.Player.Enable();
         _controls.Player.Move.performed += HandleMovePerformed;
         _controls.Player.Move.canceled += HandleMoveCancelled;
@@ -43,9 +39,14 @@ public class MovementController : MonoBehaviour, IMove
         
         _controls.UI.Enable();
         _controls.UI.EnableInventoryUI.performed += HandleControlsDisabledInUI;
+        
+        if (_rb == null)
+            _rb = GetComponent<Rigidbody>();
+        
+        _remainingDashCharges = _moveSettings.MaxDashCharges;
     }
 
-    private void OnDisable()
+    public override void OnStopLocalPlayer()
     {
         _controls.Player.Disable();
         _controls.Player.Move.performed -= HandleMovePerformed;
@@ -54,12 +55,8 @@ public class MovementController : MonoBehaviour, IMove
         
         _controls.UI.Disable();
         _controls.UI.EnableInventoryUI.performed -= HandleControlsDisabledInUI;
-    }
 
-    private void Start()
-    {
-        _lookAt.localPosition = new Vector3(1, 0, 0);
-        _currentMoveSpeed = _moveSettings.WalkSpeed;
+        _controls = null;
     }
 
     private void FixedUpdate()
