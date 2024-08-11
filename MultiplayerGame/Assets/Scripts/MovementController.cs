@@ -22,6 +22,7 @@ public class MovementController : MonoBehaviour, IMove
     private bool _rechargingDash;
     private bool _resetDashRecharge;
     private int _remainingDashCharges;
+    private bool _inUI;
 
     private void Awake()
     {
@@ -39,6 +40,9 @@ public class MovementController : MonoBehaviour, IMove
         _controls.Player.Move.performed += HandleMovePerformed;
         _controls.Player.Move.canceled += HandleMoveCancelled;
         _controls.Player.Dash.performed += HandleDash;
+        
+        _controls.UI.Enable();
+        _controls.UI.EnableInventoryUI.performed += HandleControlsDisabledInUI;
     }
 
     private void OnDisable()
@@ -47,6 +51,9 @@ public class MovementController : MonoBehaviour, IMove
         _controls.Player.Move.performed -= HandleMovePerformed;
         _controls.Player.Move.canceled -= HandleMoveCancelled;
         _controls.Player.Dash.performed -= HandleDash;
+        
+        _controls.UI.Disable();
+        _controls.UI.EnableInventoryUI.performed -= HandleControlsDisabledInUI;
     }
 
     private void Start()
@@ -89,6 +96,12 @@ public class MovementController : MonoBehaviour, IMove
 
     public void HandleMove()
     {
+        if (_inUI)
+        {
+            _rb.velocity = Vector3.zero;
+            return;
+        }
+
         _moveDelta.x = _moveDirection.x;
         _moveDelta.z = _moveDirection.y;
         _moveDelta *= _currentMoveSpeed * Time.fixedDeltaTime;
@@ -97,6 +110,9 @@ public class MovementController : MonoBehaviour, IMove
 
     public void HandleDash(InputAction.CallbackContext callbackContext)
     {
+        if (_inUI)
+            return;
+        
         StartCoroutine(InitializeDashRoutine());
     }
 
@@ -142,6 +158,11 @@ public class MovementController : MonoBehaviour, IMove
         
         if(_remainingDashCharges < _moveSettings.MaxDashCharges)
             RechargeDash();
+    }
+
+    private void HandleControlsDisabledInUI(InputAction.CallbackContext obj)
+    {
+        _inUI = !_inUI;
     }
 
     private void OnDrawGizmos()

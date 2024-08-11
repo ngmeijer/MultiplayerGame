@@ -10,4 +10,8 @@ public class CombatSettings : ScriptableObject
     
     [SerializeField] [Range(1, 400)] private int _maxArmor;
     public int MaxArmor => _maxArmor;
+    
+    [SerializeField] [Range(0, 50)] private int _weaponRotationSpeed;
+    public int WeaponRotationSpeed => _weaponRotationSpeed;
+    
 }

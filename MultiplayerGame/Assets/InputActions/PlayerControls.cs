@@ -53,6 +53,24 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": true
+                },
+                {
+                    ""name"": ""Attack"",
+                    ""type"": ""Button"",
+                    ""id"": ""c759acf5-832a-4797-a2f8-3a6dc7aadeae"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""MouseMove"",
+                    ""type"": ""Value"",
+                    ""id"": ""8bd54c9d-001d-4002-94ae-92a9041be669"",
+                    ""expectedControlType"": ""Vector2"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": true
                 }
             ],
             ""bindings"": [
@@ -275,6 +293,39 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
                     ""action"": ""Zoom"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""7a5d3112-c121-4c16-af37-27a9b30cf949"",
+                    ""path"": ""<Mouse>/leftButton"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Attack"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""1e5ef950-3b59-452f-9ccc-5d47298eea21"",
+                    ""path"": ""<Gamepad>/rightTrigger"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Attack"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""7765348e-4674-43f5-8e07-bb2b58d84c5b"",
+                    ""path"": ""<Mouse>/position"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""MouseMove"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         },
@@ -286,6 +337,15 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
                     ""name"": ""EnableShopUI"",
                     ""type"": ""Button"",
                     ""id"": ""7a032709-7300-4b5c-a80d-334796e5e768"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""EnableInventoryUI"",
+                    ""type"": ""Button"",
+                    ""id"": ""f6370dd0-5fa3-4fbc-bdbe-1f441f5ccd1e"",
                     ""expectedControlType"": ""Button"",
                     ""processors"": """",
                     ""interactions"": """",
@@ -312,6 +372,28 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""groups"": ""Gamepad"",
                     ""action"": ""EnableShopUI"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""b3878fa5-8027-4be9-bffc-556a9b6c3653"",
+                    ""path"": ""<Keyboard>/tab"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""EnableInventoryUI"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""e87c6b1d-3e7a-4e80-8f2b-e852ad11c084"",
+                    ""path"": ""<Gamepad>/dpad/up"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""EnableInventoryUI"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 }
@@ -386,9 +468,12 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
         m_Player_Move = m_Player.FindAction("Move", throwIfNotFound: true);
         m_Player_Dash = m_Player.FindAction("Dash", throwIfNotFound: true);
         m_Player_Zoom = m_Player.FindAction("Zoom", throwIfNotFound: true);
+        m_Player_Attack = m_Player.FindAction("Attack", throwIfNotFound: true);
+        m_Player_MouseMove = m_Player.FindAction("MouseMove", throwIfNotFound: true);
         // UI
         m_UI = asset.FindActionMap("UI", throwIfNotFound: true);
         m_UI_EnableShopUI = m_UI.FindAction("EnableShopUI", throwIfNotFound: true);
+        m_UI_EnableInventoryUI = m_UI.FindAction("EnableInventoryUI", throwIfNotFound: true);
     }
 
     public void Dispose()
@@ -453,6 +538,8 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
     private readonly InputAction m_Player_Move;
     private readonly InputAction m_Player_Dash;
     private readonly InputAction m_Player_Zoom;
+    private readonly InputAction m_Player_Attack;
+    private readonly InputAction m_Player_MouseMove;
     public struct PlayerActions
     {
         private @PlayerControls m_Wrapper;
@@ -460,6 +547,8 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
         public InputAction @Move => m_Wrapper.m_Player_Move;
         public InputAction @Dash => m_Wrapper.m_Player_Dash;
         public InputAction @Zoom => m_Wrapper.m_Player_Zoom;
+        public InputAction @Attack => m_Wrapper.m_Player_Attack;
+        public InputAction @MouseMove => m_Wrapper.m_Player_MouseMove;
         public InputActionMap Get() { return m_Wrapper.m_Player; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -478,6 +567,12 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
             @Zoom.started += instance.OnZoom;
             @Zoom.performed += instance.OnZoom;
             @Zoom.canceled += instance.OnZoom;
+            @Attack.started += instance.OnAttack;
+            @Attack.performed += instance.OnAttack;
+            @Attack.canceled += instance.OnAttack;
+            @MouseMove.started += instance.OnMouseMove;
+            @MouseMove.performed += instance.OnMouseMove;
+            @MouseMove.canceled += instance.OnMouseMove;
         }
 
         private void UnregisterCallbacks(IPlayerActions instance)
@@ -491,6 +586,12 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
             @Zoom.started -= instance.OnZoom;
             @Zoom.performed -= instance.OnZoom;
             @Zoom.canceled -= instance.OnZoom;
+            @Attack.started -= instance.OnAttack;
+            @Attack.performed -= instance.OnAttack;
+            @Attack.canceled -= instance.OnAttack;
+            @MouseMove.started -= instance.OnMouseMove;
+            @MouseMove.performed -= instance.OnMouseMove;
+            @MouseMove.canceled -= instance.OnMouseMove;
         }
 
         public void RemoveCallbacks(IPlayerActions instance)
@@ -513,11 +614,13 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
     private readonly InputActionMap m_UI;
     private List<IUIActions> m_UIActionsCallbackInterfaces = new List<IUIActions>();
     private readonly InputAction m_UI_EnableShopUI;
+    private readonly InputAction m_UI_EnableInventoryUI;
     public struct UIActions
     {
         private @PlayerControls m_Wrapper;
         public UIActions(@PlayerControls wrapper) { m_Wrapper = wrapper; }
         public InputAction @EnableShopUI => m_Wrapper.m_UI_EnableShopUI;
+        public InputAction @EnableInventoryUI => m_Wrapper.m_UI_EnableInventoryUI;
         public InputActionMap Get() { return m_Wrapper.m_UI; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -530,6 +633,9 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
             @EnableShopUI.started += instance.OnEnableShopUI;
             @EnableShopUI.performed += instance.OnEnableShopUI;
             @EnableShopUI.canceled += instance.OnEnableShopUI;
+            @EnableInventoryUI.started += instance.OnEnableInventoryUI;
+            @EnableInventoryUI.performed += instance.OnEnableInventoryUI;
+            @EnableInventoryUI.canceled += instance.OnEnableInventoryUI;
         }
 
         private void UnregisterCallbacks(IUIActions instance)
@@ -537,6 +643,9 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
             @EnableShopUI.started -= instance.OnEnableShopUI;
             @EnableShopUI.performed -= instance.OnEnableShopUI;
             @EnableShopUI.canceled -= instance.OnEnableShopUI;
+            @EnableInventoryUI.started -= instance.OnEnableInventoryUI;
+            @EnableInventoryUI.performed -= instance.OnEnableInventoryUI;
+            @EnableInventoryUI.canceled -= instance.OnEnableInventoryUI;
         }
 
         public void RemoveCallbacks(IUIActions instance)
@@ -604,9 +713,12 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
         void OnMove(InputAction.CallbackContext context);
         void OnDash(InputAction.CallbackContext context);
         void OnZoom(InputAction.CallbackContext context);
+        void OnAttack(InputAction.CallbackContext context);
+        void OnMouseMove(InputAction.CallbackContext context);
     }
     public interface IUIActions
     {
         void OnEnableShopUI(InputAction.CallbackContext context);
+        void OnEnableInventoryUI(InputAction.CallbackContext context);
     }
 }

@@ -1,33 +1,21 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Hazard : MonoBehaviour, IHealthHandler
+public enum HazardType
+{
+    
+}
+
+public class Hazard : MonoBehaviour
 {
     [SerializeField] private int _damage;
-
-    public void ReceiveDamage(int pAmount)
-    {
-        
-    }
-
-    public void RegenerateHealth(int pAmount)
-    {
-        
-    }
+    private float _timer;
+    [SerializeField] private float _damageInterval = 0.5f;
 
     private void OnCollisionEnter(Collision collision)
     {
-        if (collision.transform.TryGetComponent(out IHealthHandler damageHandler))
-        {
-            damageHandler.ReceiveDamage(_damage);
-        }
+        
     }
-}
-
-public interface IHealthHandler
-{
-    public void ReceiveDamage(int pAmount);
-
-    public void RegenerateHealth(int pAmount);
 }
