@@ -9,6 +9,7 @@ public class CameraController : NetworkBehaviour
 {
     [SerializeField] private MovementSettings _moveSettings;
     [SerializeField] private Transform _cameraHolder;
+    [SerializeField] private Vector3 _defaultOffset;
     private Transform _cameraTarget;
     private Camera _camera;
     private Vector3 _previousTargetPosition;
@@ -23,7 +24,9 @@ public class CameraController : NetworkBehaviour
     {
         _camera = Camera.main;
         _cameraTarget = this.transform;
-        //_camera.transform.position += transform.position - _camera.transform.position;
+
+        //Figure out Y & Z difference and add it to position
+        _camera.transform.position = _cameraTarget.position + _defaultOffset;
 
         _controls = new PlayerControls();
         _controls.Player.Enable();
@@ -31,9 +34,6 @@ public class CameraController : NetworkBehaviour
         _controls.Player.Zoom.canceled += HandleZoomCancelled;
 
         _previousTargetPosition = _cameraTarget.position;
-
-        if (_camera == null)
-            _camera = GetComponent<Camera>();
     }
 
     public override void OnStopLocalPlayer()
@@ -45,11 +45,17 @@ public class CameraController : NetworkBehaviour
 
     private void Update()
     {
+        if (!isLocalPlayer)
+            return;
+        
         HandleZoom();
     }
 
     private void LateUpdate()
     {
+        if (!isLocalPlayer)
+            return;
+        
         HandleMove();
     }
 
@@ -74,6 +80,8 @@ public class CameraController : NetworkBehaviour
             _camera.orthographicSize, 
             _camera.orthographicSize + (_moveSettings.ZoomSpeed * -_zoomValue),
             Time.deltaTime * _moveSettings.ZoomSpeed);
+        
+        Debug.Log(newSize);
 
         newSize = Mathf.Clamp(newSize, _moveSettings.MaxZoomIn, _moveSettings.MaxZoomOut);
         _camera.orthographicSize = newSize;
