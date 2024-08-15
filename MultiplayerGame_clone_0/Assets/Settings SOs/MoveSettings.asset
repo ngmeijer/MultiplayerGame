@@ -1,0 +1,24 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3e50f231ab494cf39b27533093957c8e, type: 3}
+  m_Name: MoveSettings
+  m_EditorClassIdentifier: 
+  _rotateSpeed: 6
+  _walkSpeed: 250
+  _dashSpeed: 1500
+  _dashDuration: 0.2
+  _maxDashCharges: 3
+  _dashRechargeRate: 1.3
+  RemainingDashCharges: 2
+  _maxZoomIn: 4
+  _maxZoomOut: 30
+  _zoomSpeed: 4
