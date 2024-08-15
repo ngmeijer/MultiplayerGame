@@ -13,7 +13,7 @@ public class MovementController : NetworkBehaviour, IMove
     [SerializeField] private GameObject _gfx;
     [SerializeField] private Rigidbody _rb;
     [SerializeField] private Transform _lookAt;
-    [SerializeField] private UnityEvent<int> OnDashCountChanged = new UnityEvent<int>();
+    [SerializeField] private UnityEvent<int> OnDash = new UnityEvent<int>();
 
     private Vector2 _moveDirection;
     private Vector3 _moveDelta;
@@ -23,6 +23,7 @@ public class MovementController : NetworkBehaviour, IMove
     private bool _rechargingDash;
     private bool _resetDashRecharge;
     private int _remainingDashCharges;
+    public int RemainingDashCharges => _remainingDashCharges;
     private bool _inUI;
 
     public override void OnStartLocalPlayer()
@@ -126,7 +127,7 @@ public class MovementController : NetworkBehaviour, IMove
         _inDash = true;
 
         _currentMoveSpeed = _moveSettings.DashSpeed;
-        OnDashCountChanged?.Invoke(_remainingDashCharges);
+        OnDash?.Invoke(_remainingDashCharges);
         
         yield return new WaitForSeconds(_moveSettings.DashDuration);
         _currentMoveSpeed = _moveSettings.WalkSpeed;
@@ -150,7 +151,7 @@ public class MovementController : NetworkBehaviour, IMove
         yield return new WaitForSeconds(_moveSettings.DashRechargeRate);
 
         _remainingDashCharges++;
-        OnDashCountChanged?.Invoke(_remainingDashCharges);
+        OnDash?.Invoke(_remainingDashCharges);
         _rechargingDash = false;
         
         if(_remainingDashCharges < _moveSettings.MaxDashCharges)

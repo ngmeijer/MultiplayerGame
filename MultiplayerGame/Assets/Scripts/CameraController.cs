@@ -1,15 +1,25 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using DG.Tweening;
 using Mirror;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
+[Serializable]
+public struct ScreenShakeSettings
+{
+    public float Strength;
+    public int Vibrato;
+    public float Randomness;
+}
+
 public class CameraController : NetworkBehaviour
 {
     [SerializeField] private MovementSettings _moveSettings;
-    [SerializeField] private Transform _cameraHolder;
     [SerializeField] private Vector3 _defaultOffset;
+    [SerializeField] private ScreenShakeSettings _screenshakeSettings;
+    private MovementController _moveController;
     private Transform _cameraTarget;
     private Camera _camera;
     private Vector3 _previousTargetPosition;
@@ -22,16 +32,18 @@ public class CameraController : NetworkBehaviour
 
     public override void OnStartLocalPlayer()
     {
+        _moveController = GetComponent<MovementController>();
         _camera = Camera.main;
         _cameraTarget = this.transform;
 
         //Figure out Y & Z difference and add it to position
-        _camera.transform.position = _cameraTarget.position + _defaultOffset;
+        _camera.transform.parent.position = _cameraTarget.position + _defaultOffset;
 
         _controls = new PlayerControls();
         _controls.Player.Enable();
         _controls.Player.Zoom.performed += HandleZoomPerformed;
         _controls.Player.Zoom.canceled += HandleZoomCancelled;
+        _controls.Player.Dash.performed += HandleDashPerformed;
 
         _previousTargetPosition = _cameraTarget.position;
     }
@@ -62,13 +74,13 @@ public class CameraController : NetworkBehaviour
     public void HandleMove()
     {
         Vector3 moveDelta = _cameraTarget.position - _previousTargetPosition;
-        _camera.transform.position += moveDelta;
+        _camera.transform.parent.position += moveDelta;
         _previousTargetPosition = _cameraTarget.position;
     }
 
-    public void HandleDash(int pRemainingCharges)
+    public void HandleDashPerformed(InputAction.CallbackContext callbackContext)
     {
-        StartCoroutine(InitializeDash(pRemainingCharges));
+        StartCoroutine(InitializeDash());
     }
 
     private void HandleZoom()
@@ -81,8 +93,6 @@ public class CameraController : NetworkBehaviour
             _camera.orthographicSize + (_moveSettings.ZoomSpeed * -_zoomValue),
             Time.deltaTime * _moveSettings.ZoomSpeed);
         
-        Debug.Log(newSize);
-
         newSize = Mathf.Clamp(newSize, _moveSettings.MaxZoomIn, _moveSettings.MaxZoomOut);
         _camera.orthographicSize = newSize;
     }
@@ -101,18 +111,24 @@ public class CameraController : NetworkBehaviour
         _zoomValue = 0;
     }
 
-    private IEnumerator InitializeDash(int pRemainingCharges)
+    private IEnumerator InitializeDash()
     {
         if (_inDash)
             yield break;
 
-        if (pRemainingCharges <= 0)
+        if (_moveController.RemainingDashCharges <= 0)
             yield break;
-        
+
         _inDash = true;
+        InitializeScreenshake();
         
         yield return new WaitForSeconds(_moveSettings.DashDuration);
 
         _inDash = false;
+    }
+
+    public void InitializeScreenshake()
+    {
+        _camera.transform.DOShakePosition(0.9f * _moveSettings.DashDuration, _screenshakeSettings.Strength, _screenshakeSettings.Vibrato, _screenshakeSettings.Randomness);
     }
 }

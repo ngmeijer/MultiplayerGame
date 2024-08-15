@@ -121,7 +121,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 26d89ebb3ec852b43af7df55355a01a8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _type: 0
+  syncDirection: 0
+  syncMode: 0
+  syncInterval: 0
+  _settings:
+    Type: 0
   _maxResourceAmount: 100
   _collectionRate: 1
   _currentResourceAmountText: {fileID: 7371635669462183068}

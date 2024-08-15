@@ -382,7 +382,7 @@ MonoBehaviour:
   _gfx: {fileID: 6476816851886301456}
   _rb: {fileID: 6003821316483503021}
   _lookAt: {fileID: 1554983434008697358}
-  OnDashCountChanged:
+  OnDash:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 361988091875796336}
@@ -504,8 +504,11 @@ MonoBehaviour:
   syncMode: 0
   syncInterval: 0
   _moveSettings: {fileID: 11400000, guid: bd04227e835ceb448826f0d941591326, type: 2}
-  _cameraHolder: {fileID: 3778742759033349331}
   _defaultOffset: {x: 0, y: 23, z: -30}
+  _screenshakeSettings:
+    Strength: 3
+    Vibrato: 15
+    Randomness: 60
 --- !u!114 &482249695155673238
 MonoBehaviour:
   m_ObjectHideFlags: 0
