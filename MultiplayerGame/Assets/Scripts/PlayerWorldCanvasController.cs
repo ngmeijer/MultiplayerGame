@@ -2,14 +2,16 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using Mirror;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class PlayerWorldCanvasController : MonoBehaviour
+public class PlayerWorldCanvasController : NetworkBehaviour
 {
     [SerializeField] private MovementSettings _moveSettings;
     [SerializeField] private GameObject _dashChargeUIPrefab;
-    [SerializeField] private Transform _dashChargesUIParent;
+    [SerializeField] private Transform _dashCharges;
+    [SerializeField] private Transform _dashChargesUIContainer;
     [SerializeField] private Color _dashChargeUIColor;
     private Color _currentDashChargeUIColor;
     private List<Image> _dashChargeImages = new List<Image>();
@@ -17,8 +19,9 @@ public class PlayerWorldCanvasController : MonoBehaviour
     [SerializeField] private CombatSettings _combatSettings;
     [SerializeField] private Image _healthBar;
     
-    private void Start()
+    public override void OnStartLocalPlayer()
     {
+        _dashChargesUIContainer.gameObject.SetActive(true);
         _currentDashChargeUIColor = _dashChargeUIColor;
         CreateDashChargesUI();
     }
@@ -27,7 +30,7 @@ public class PlayerWorldCanvasController : MonoBehaviour
     {
         for (int i = 0; i < _moveSettings.MaxDashCharges; i++)
         {
-            Image dashInstance = Instantiate(_dashChargeUIPrefab, _dashChargesUIParent).GetComponentInChildren<Image>();
+            Image dashInstance = Instantiate(_dashChargeUIPrefab, _dashCharges).GetComponentInChildren<Image>();
             _dashChargeImages.Add(dashInstance);
         }   
     }
