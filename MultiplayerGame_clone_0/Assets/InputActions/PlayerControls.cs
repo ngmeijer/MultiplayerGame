@@ -71,6 +71,15 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": true
+                },
+                {
+                    ""name"": ""RangedWeaponScope"",
+                    ""type"": ""Button"",
+                    ""id"": ""77aaa834-0694-41a8-b321-9455bac5552b"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -326,6 +335,17 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
                     ""action"": ""MouseMove"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""e6fa8bc8-f7db-4638-aee9-09245fa589a1"",
+                    ""path"": ""<Mouse>/rightButton"",
+                    ""interactions"": ""Hold(duration=0.1)"",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""RangedWeaponScope"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         },
@@ -470,6 +490,7 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
         m_Player_Zoom = m_Player.FindAction("Zoom", throwIfNotFound: true);
         m_Player_Attack = m_Player.FindAction("Attack", throwIfNotFound: true);
         m_Player_MouseMove = m_Player.FindAction("MouseMove", throwIfNotFound: true);
+        m_Player_RangedWeaponScope = m_Player.FindAction("RangedWeaponScope", throwIfNotFound: true);
         // UI
         m_UI = asset.FindActionMap("UI", throwIfNotFound: true);
         m_UI_EnableShopUI = m_UI.FindAction("EnableShopUI", throwIfNotFound: true);
@@ -540,6 +561,7 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
     private readonly InputAction m_Player_Zoom;
     private readonly InputAction m_Player_Attack;
     private readonly InputAction m_Player_MouseMove;
+    private readonly InputAction m_Player_RangedWeaponScope;
     public struct PlayerActions
     {
         private @PlayerControls m_Wrapper;
@@ -549,6 +571,7 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
         public InputAction @Zoom => m_Wrapper.m_Player_Zoom;
         public InputAction @Attack => m_Wrapper.m_Player_Attack;
         public InputAction @MouseMove => m_Wrapper.m_Player_MouseMove;
+        public InputAction @RangedWeaponScope => m_Wrapper.m_Player_RangedWeaponScope;
         public InputActionMap Get() { return m_Wrapper.m_Player; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -573,6 +596,9 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
             @MouseMove.started += instance.OnMouseMove;
             @MouseMove.performed += instance.OnMouseMove;
             @MouseMove.canceled += instance.OnMouseMove;
+            @RangedWeaponScope.started += instance.OnRangedWeaponScope;
+            @RangedWeaponScope.performed += instance.OnRangedWeaponScope;
+            @RangedWeaponScope.canceled += instance.OnRangedWeaponScope;
         }
 
         private void UnregisterCallbacks(IPlayerActions instance)
@@ -592,6 +618,9 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
             @MouseMove.started -= instance.OnMouseMove;
             @MouseMove.performed -= instance.OnMouseMove;
             @MouseMove.canceled -= instance.OnMouseMove;
+            @RangedWeaponScope.started -= instance.OnRangedWeaponScope;
+            @RangedWeaponScope.performed -= instance.OnRangedWeaponScope;
+            @RangedWeaponScope.canceled -= instance.OnRangedWeaponScope;
         }
 
         public void RemoveCallbacks(IPlayerActions instance)
@@ -715,6 +744,7 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
         void OnZoom(InputAction.CallbackContext context);
         void OnAttack(InputAction.CallbackContext context);
         void OnMouseMove(InputAction.CallbackContext context);
+        void OnRangedWeaponScope(InputAction.CallbackContext context);
     }
     public interface IUIActions
     {

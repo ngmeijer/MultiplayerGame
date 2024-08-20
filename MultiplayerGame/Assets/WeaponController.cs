@@ -14,15 +14,19 @@ public class WeaponController : NetworkBehaviour
     private Animator _currentWeaponAnimator;
     private WeaponSettings _weaponSettings;
 
+    private Vector3 _mouseWorldPos;
+
     [SerializeField] private LineRenderer _scopeTracer;
     [SerializeField] private Transform _weaponParent;
     [SerializeField] private Transform _rangedWeaponParent;
     [SerializeField] private Transform _rangedWeaponLookAt;
+    [SerializeField] private Transform _weaponBarrelEnd;
     
     public override void OnStartLocalPlayer()
     {
         _cam = Camera.main;
         _scopeTracer.enabled = false;
+        _rangedWeaponLookAt.parent = null;
         _controls = new PlayerControls();
 
         _controls.Player.Enable();
@@ -41,13 +45,13 @@ public class WeaponController : NetworkBehaviour
         _controls.Player.RangedWeaponScope.canceled -= HandleWeaponScopeCanceled;
     }
 
-    private void Update()
+    private void LateUpdate()
     {
         if (!isLocalPlayer)
             return;
         
-        _scopeTracer.SetPosition(0, _weaponParent.position);
-        _scopeTracer.SetPosition(1, _rangedWeaponLookAt.position);
+        _scopeTracer.SetPosition(0, _weaponBarrelEnd.position);
+        _scopeTracer.SetPosition(1, new Vector3(_rangedWeaponLookAt.position.x, _weaponBarrelEnd.position.y, _rangedWeaponLookAt.position.z));
     }
 
     public void ReceiveWeaponData(WeaponSettings pWeaponSettings)
@@ -63,25 +67,20 @@ public class WeaponController : NetworkBehaviour
         _canAttack = true;
     }
 
+    private void DetermineAimDirection(Vector2 pMousePos)
+    {
+        _mouseWorldPos = _cam.ScreenToWorldPoint(new Vector3(pMousePos.x, pMousePos.y, _cam.nearClipPlane));
+        Physics.Raycast(_mouseWorldPos, _cam.transform.forward, out RaycastHit visiblePositionData);
+        Vector3 lookAtTargetPos = visiblePositionData.point;
+        lookAtTargetPos.y = _weaponParent.position.y;
+        _rangedWeaponLookAt.transform.position = lookAtTargetPos;
+        _rangedWeaponParent.LookAt(_rangedWeaponLookAt);
+    }
+
     private void HandleMouseMovePerformed(InputAction.CallbackContext obj)
     {
         Vector2 mousePos = obj.ReadValue<Vector2>();
-        Vector3 mouseWorldPos = _cam.ScreenToWorldPoint(new Vector3(mousePos.x, mousePos.y, _cam.nearClipPlane));
-        bool hasValidPositionOnGround = Physics.Raycast(mouseWorldPos, _cam.transform.forward);
-
-        Vector3 lookAtTargetPos = Vector3.zero;
-        if (!hasValidPositionOnGround)
-            return;
-
-        bool canSeePosition = Physics.Raycast(_weaponParent.position, mouseWorldPos, out RaycastHit visiblePositionData);
-        if (!canSeePosition)
-            lookAtTargetPos = visiblePositionData.point;
-        
-
-        lookAtTargetPos.y = _weaponParent.position.y;
-        _rangedWeaponLookAt.transform.position = lookAtTargetPos;
-        
-        _rangedWeaponParent.LookAt(_rangedWeaponLookAt);
+        DetermineAimDirection(mousePos);
     }
 
     private void HandleAttackPerformed(InputAction.CallbackContext obj)
@@ -115,5 +114,7 @@ public class WeaponController : NetworkBehaviour
         Gizmos.color = Color.red;
         Gizmos.DrawSphere(_rangedWeaponLookAt.position, 0.5f);
         Gizmos.DrawLine(transform.position, _rangedWeaponParent.position);
+        
+        Gizmos.DrawSphere(_mouseWorldPos, 0.5f);
     }
 }

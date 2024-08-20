@@ -1,65 +1,28 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Mirror;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.InputSystem;
 
-public class CombatController : MonoBehaviour, IHealthHandler
+public class CombatController : NetworkBehaviour, IHealthHandler
 {
     public const float MAX_ARMOR = 1000;
     [SerializeField] private CombatSettings _settings;
     [SerializeField] private UnityEvent<float> OnHealthChanged = new();
-    [SerializeField] private Transform _weaponParent;
-    private PlayerControls _controls;
     private Vector3 _startPos;
     private float _remainingHealth;
     private int _remainingArmor;
-    private Animator _currentWeaponAnimator;
-
-    private WeaponSettings _weaponSettings;
-
+    
     private ArmorSettings _helmetSettings;
     private ArmorSettings _upperBodySettings;
     private ArmorSettings _lowerBodySettings;
-
-    private bool _canAttack = true;
-
-    [SerializeField] private Transform _rangedWeaponParent;
-    [SerializeField] private Transform _rangedWeaponLookAt;
-    private Camera _cam;
-
-    private void Awake()
-    {
-        _cam = Camera.main;
-        _controls = new PlayerControls();
-    }
 
     private void Start()
     {
         _remainingHealth = _settings.MaxHealth;
         _startPos = transform.position;
-    }
-
-    private void OnEnable()
-    {
-        _controls.Player.Enable();
-        _controls.Player.Attack.performed += HandleAttackPerformed;
-        _controls.Player.MouseMove.performed += HandleMouseMovePerformed;
-    }
-
-    private void OnDisable()
-    {
-        _controls.Player.Disable();
-        _controls.Player.Attack.performed -= HandleAttackPerformed;
-        _controls.Player.MouseMove.performed -= HandleMouseMovePerformed;
-    }
-
-    private IEnumerator StartWeaponAttackCountdown()
-    {
-        yield return new WaitForSeconds(_weaponSettings.AttackSpeed);
-
-        _canAttack = true;
     }
 
     public void ReceiveDamage(int pAmount)
@@ -79,18 +42,6 @@ public class CombatController : MonoBehaviour, IHealthHandler
         }
     }
 
-    private void HandleMouseMovePerformed(InputAction.CallbackContext obj)
-    {
-        Vector2 mousePos = obj.ReadValue<Vector2>();
-        Vector3 mouseWorldPos = _cam.ScreenToWorldPoint(new Vector3(mousePos.x, mousePos.y, _cam.nearClipPlane));
-        Physics.Raycast(mouseWorldPos, _cam.transform.forward, out RaycastHit hit);
-
-        Vector3 lookAtTargetPos = new Vector3(hit.point.x, 0.2f, hit.point.z);
-        _rangedWeaponLookAt.transform.position = lookAtTargetPos;
-        
-        _rangedWeaponParent.LookAt(_rangedWeaponLookAt);
-    }
-
     private int GetTotalAvailableArmor()
     {
         float armorValue = _helmetSettings.ArmorValue + _upperBodySettings.ArmorValue + _lowerBodySettings.ArmorValue;
@@ -103,20 +54,6 @@ public class CombatController : MonoBehaviour, IHealthHandler
         int damageReductionPercentage = totalAvailableArmor / _settings.MaxArmor;
         int netDamage = pRawDamage - (damageReductionPercentage * totalAvailableArmor);
         return netDamage;
-    }
-
-    private void HandleAttackPerformed(InputAction.CallbackContext obj)
-    {
-        if (!_canAttack)
-            return;
-
-        if (_currentWeaponAnimator == null)
-            return;
-        
-        _currentWeaponAnimator.SetTrigger("Attack");
-        _canAttack = false;
-
-        StartCoroutine(StartWeaponAttackCountdown());
     }
 
     private void ResetStats()
@@ -157,12 +94,6 @@ public class CombatController : MonoBehaviour, IHealthHandler
             default:
                 throw new ArgumentOutOfRangeException();
         }
-    }
-
-    public void ReceiveWeaponData(WeaponSettings pWeaponSettings)
-    {
-        _weaponSettings = pWeaponSettings;
-        _currentWeaponAnimator = _weaponParent.GetComponentInChildren<Animator>();
     }
 
     public void GetInstantHealth(BuffData pData)
@@ -211,12 +142,5 @@ public class CombatController : MonoBehaviour, IHealthHandler
             
             yield return new WaitForSeconds(pInterval);
         }
-    }
-
-    private void OnDrawGizmos()
-    {
-        Gizmos.color = Color.red;
-        Gizmos.DrawSphere(_rangedWeaponLookAt.position, 0.5f);
-        Gizmos.DrawLine(transform.position, _rangedWeaponParent.position);
     }
 }
