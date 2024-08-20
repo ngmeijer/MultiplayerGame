@@ -10,9 +10,16 @@ public enum WeaponType
     Axe
 }
 
+public enum WeaponRangeType
+{
+    Ranged,
+    Melee,
+}
+
 [CreateAssetMenu(menuName = "Player SO/Weapon instance")]
 public class WeaponSettings : ScriptableObject
 {
+    
     [SerializeField] private WeaponType _type;
     public WeaponType Type => _type;
     [SerializeField] private Sprite _weaponUISprite;
@@ -29,4 +36,7 @@ public class WeaponSettings : ScriptableObject
 
     [SerializeField] [Range(0, 1000)] private float _critDamage;
     public float CritDamage => _critDamage;
+
+    [SerializeField] private GameObject _projectileInstance;
+    public GameObject ProjectileInstance => _projectileInstance;
 }

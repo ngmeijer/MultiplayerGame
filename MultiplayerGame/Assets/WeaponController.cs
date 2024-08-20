@@ -1,120 +1,35 @@
-using System;
 using System.Collections;
 using System.Collections.Generic;
-using Mirror;
 using UnityEngine;
-using UnityEngine.InputSystem;
 
-public class WeaponController : NetworkBehaviour
+public class WeaponController : MonoBehaviour
 {
-    private PlayerControls _controls;
-    private Camera _cam;
+    [SerializeField] private WeaponSettings _weaponSettings;
+    public WeaponSettings Settings => _weaponSettings;
     private bool _canAttack = true;
-    private bool _inScope;
-    private Animator _currentWeaponAnimator;
-    private WeaponSettings _weaponSettings;
-
-    private Vector3 _mouseWorldPos;
-
-    [SerializeField] private LineRenderer _scopeTracer;
-    [SerializeField] private Transform _weaponParent;
-    [SerializeField] private Transform _rangedWeaponParent;
-    [SerializeField] private Transform _rangedWeaponLookAt;
-    [SerializeField] private Transform _weaponBarrelEnd;
     
-    public override void OnStartLocalPlayer()
+    public bool CanAttack()
     {
-        _cam = Camera.main;
-        _scopeTracer.enabled = false;
-        _rangedWeaponLookAt.parent = null;
-        _controls = new PlayerControls();
-
-        _controls.Player.Enable();
-        _controls.Player.Attack.performed += HandleAttackPerformed;
-        _controls.Player.MouseMove.performed += HandleMouseMovePerformed;
-        _controls.Player.RangedWeaponScope.started += HandleWeaponScopeStarted;
-        _controls.Player.RangedWeaponScope.canceled += HandleWeaponScopeCanceled;
+        return _canAttack;
     }
 
-    public override void OnStopLocalPlayer()
+    public void StartAttack()
     {
-        _controls.Player.Disable();
-        _controls.Player.Attack.performed -= HandleAttackPerformed;
-        _controls.Player.MouseMove.performed -= HandleMouseMovePerformed;
-        _controls.Player.RangedWeaponScope.started -= HandleWeaponScopeStarted;
-        _controls.Player.RangedWeaponScope.canceled -= HandleWeaponScopeCanceled;
-    }
-
-    private void LateUpdate()
-    {
-        if (!isLocalPlayer)
+        if (!CanAttack())
             return;
         
-        _scopeTracer.SetPosition(0, _weaponBarrelEnd.position);
-        _scopeTracer.SetPosition(1, new Vector3(_rangedWeaponLookAt.position.x, _weaponBarrelEnd.position.y, _rangedWeaponLookAt.position.z));
+        
     }
 
-    public void ReceiveWeaponData(WeaponSettings pWeaponSettings)
+    private void PerformRangedAttack()
     {
-        _weaponSettings = pWeaponSettings;
-        _currentWeaponAnimator = _weaponParent.GetComponentInChildren<Animator>();
+        
     }
-
+    
     private IEnumerator StartWeaponAttackCountdown()
     {
-        yield return new WaitForSeconds(_weaponSettings.AttackSpeed);
+        yield return new WaitForSeconds(Settings.AttackSpeed);
 
         _canAttack = true;
-    }
-
-    private void DetermineAimDirection(Vector2 pMousePos)
-    {
-        _mouseWorldPos = _cam.ScreenToWorldPoint(new Vector3(pMousePos.x, pMousePos.y, _cam.nearClipPlane));
-        Physics.Raycast(_mouseWorldPos, _cam.transform.forward, out RaycastHit visiblePositionData);
-        Vector3 lookAtTargetPos = visiblePositionData.point;
-        lookAtTargetPos.y = _weaponParent.position.y;
-        _rangedWeaponLookAt.transform.position = lookAtTargetPos;
-        _rangedWeaponParent.LookAt(_rangedWeaponLookAt);
-    }
-
-    private void HandleMouseMovePerformed(InputAction.CallbackContext obj)
-    {
-        Vector2 mousePos = obj.ReadValue<Vector2>();
-        DetermineAimDirection(mousePos);
-    }
-
-    private void HandleAttackPerformed(InputAction.CallbackContext obj)
-    {
-        if (!_canAttack)
-            return;
-
-        if (_currentWeaponAnimator == null)
-            return;
-        
-        _currentWeaponAnimator.SetTrigger("Attack");
-        _canAttack = false;
-
-        StartCoroutine(StartWeaponAttackCountdown());
-    }
-
-    private void HandleWeaponScopeStarted(InputAction.CallbackContext obj)
-    {
-        _scopeTracer.enabled = true;
-        _inScope = true;
-    }
-
-    private void HandleWeaponScopeCanceled(InputAction.CallbackContext obj)
-    {
-        _scopeTracer.enabled = false;
-        _inScope = false;
-    }
-
-    private void OnDrawGizmos()
-    {
-        Gizmos.color = Color.red;
-        Gizmos.DrawSphere(_rangedWeaponLookAt.position, 0.5f);
-        Gizmos.DrawLine(transform.position, _rangedWeaponParent.position);
-        
-        Gizmos.DrawSphere(_mouseWorldPos, 0.5f);
     }
 }
